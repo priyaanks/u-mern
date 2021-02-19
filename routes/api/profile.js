@@ -70,7 +70,6 @@ router.post(
     if (skills) {
       profileFields.skills = skills.split(",").map((skill) => skill.trim());
     }
-    console.log(profileFields.skills);
     if (bio) profileFields.bio = bio;
     if (status) profileFields.status = status;
     if (githubusername) profileFields.githubusername = githubusername;
@@ -111,5 +110,60 @@ router.post(
     }
   }
 );
+
+// @route     GET api/profile
+// @desc      Get all profiles
+// @access    Public
+router.get("/", async (req, res) => {
+  try {
+    const profiles = await Profile.find().populate("user", ["name", "avatar"]);
+    res.json(profiles);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).semd("Server Error");
+  }
+});
+
+// @route     GET api/profile/user/:user_id
+// @desc      Get profile by User ID
+// @access    Public
+
+router.get("/user/:user_id", async (req, res) => {
+  try {
+    let profile = await Profile.findOne({
+      user: req.params.user_id,
+    }).populate("user", ["name", "avatar"]);
+
+    if (!profile) res.status(400).json({ msg: "Profile not found" });
+
+    res.json(profile);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind == "ObjectId") {
+      return res.status(400).json({ msg: "Profile not found" });
+    }
+    res.status(500).send("Server Error");
+  }
+});
+
+// @route     DELETE api/profile
+// @desc      Delete a Profile, User & Post
+// @access    Public
+
+router.delete("/", auth, async (req, res) => {
+  try {
+    // @todo - remove user's post
+    // Remove profile
+    await Profile.findOneAndRemove({ user: req.user.id });
+
+    // Remove User
+    await User.findOneAndRemove({ _id: req.user.id });
+
+    res.json({ msg: "User deleted" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 module.exports = router;
