@@ -1,12 +1,12 @@
 import React, { Fragment, useState } from "react";
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 import { setAlert } from '../../actions/alert'
 import { register } from '../../actions/auth'
 
-const Register = ({ setAlert, register }) => {
+const Register = ({ setAlert, register, isAuthenticated }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,6 +28,11 @@ const Register = ({ setAlert, register }) => {
     }
   };
 
+  // Redirect if logged in
+  if (isAuthenticated) {
+    return <Redirect to='/dashboard' />
+  }
+
   return (
     <Fragment>
       <h1 className='large text-primary'>Sign Up</h1>
@@ -42,6 +47,7 @@ const Register = ({ setAlert, register }) => {
             name='name'
             value={name}
             onChange={(e) => onChange(e)}
+            required
           />
         </div>
         <div className='form-group'>
@@ -51,6 +57,7 @@ const Register = ({ setAlert, register }) => {
             name='email'
             value={email}
             onChange={(e) => onChange(e)}
+            required
           />
           <small className='form-text'>
             This site uses Gravatar so if you want a profile image, use a
@@ -62,8 +69,10 @@ const Register = ({ setAlert, register }) => {
             type='password'
             placeholder='Password'
             name='password'
+            minLength='6'
             value={password}
             onChange={(e) => onChange(e)}
+            required
           />
         </div>
         <div className='form-group'>
@@ -71,8 +80,10 @@ const Register = ({ setAlert, register }) => {
             type='password'
             placeholder='Confirm Password'
             name='password2'
+            minLength='6'
             value={password2}
             onChange={(e) => onChange(e)}
+            required
           />
         </div>
         <input type='submit' className='btn btn-primary' value='Register' />
@@ -87,6 +98,11 @@ const Register = ({ setAlert, register }) => {
 Register.propTypes = {
   setAlert: PropTypes.func.isRequired,
   register: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool,
 }
 
-export default connect(null, { setAlert, register })(Register);
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated
+})
+
+export default connect(mapStateToProps, { setAlert, register })(Register);
