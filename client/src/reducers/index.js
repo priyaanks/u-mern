@@ -1,4 +1,4 @@
-import { combineReducers, combineReducerss } from 'redux';
+import { combineReducers } from 'redux';
 import alert from './alert'
 
 export default combineReducers({
