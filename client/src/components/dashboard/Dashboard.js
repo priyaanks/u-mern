@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { Spinner } from "../layout/Spinner";
 import { DashboardActions } from "./DashboardActions";
+import Experience from "./Experience";
+import Education from "./Education";
 
 import { getCurrentProfile } from "../../actions/profile";
 
@@ -27,14 +29,18 @@ const Dashboard = ({
       </p>
 
       {profile !== null ? (
-        <DashboardActions />
-      ) : (
         <>
+          <DashboardActions />
+          <Experience experience={profile.experience} />
+          <Education education={profile.education} />
+        </>
+      ) : (
+        <Experience>
           <p>You have not yet setup the profile, please add some information</p>
           <Link to='/create-profile' className='btn btn-primary my-1'>
             Create Profile
           </Link>
-        </>
+        </Experience>
       )}
     </>
   );
